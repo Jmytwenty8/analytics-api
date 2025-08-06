@@ -9,7 +9,12 @@ from fastapi import FastAPI
 
 from api.events import router as events_router
 
-app = FastAPI(redirect_slashes=False)
+app = FastAPI(
+    redirect_slashes=False,
+    docs_url="/docs",  # Swagger UI
+    redoc_url="/redoc",  # ReDoc
+    openapi_url="/openapi.json",  # OpenAPI schema
+)
 app.include_router(events_router, prefix="/api/events", tags=["events"])
 
 
@@ -44,6 +49,7 @@ def read_item(item_id: int, q: str | None = None) -> dict:
 
     """
     return {"item_id": item_id, "q": q, "message": "This is a sample FastAPI application."}
+
 
 @app.get("/health-check")
 def health_check() -> dict:
