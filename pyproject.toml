@@ -14,6 +14,14 @@ sqlmodel = ">=0.0.24,<0.0.25"
 pydantic = ">=2.11.7,<3.0.0"
 sqlalchemy = ">=2.0.42,<3.0.0"
 requests = "^2.32.4"
+httpx = "^0.28.1"
+ruff = "^0.12.7"
+
+[tool.ruff.lint]
+select = ["ALL"]
+
+[tool.ruff]
+line-length = 120
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
