@@ -1,0 +1,23 @@
+services:
+  app:
+    image: analytics-api:v1
+    build:
+      context: .
+      dockerfile: dockerfile
+    environment:
+      - PORT=8000
+    ports:
+      - "8000:8000"
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./src:/code:rw
+    develop:
+      watch:
+        - action: rebuild
+          path: dockerfile
+        - action: rebuild
+          path: compose.yaml
+        - action: rebuild
+          path: pyproject.toml
+        - action: rebuild
+          path: poetry.lock
