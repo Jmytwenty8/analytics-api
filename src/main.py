@@ -10,7 +10,6 @@ from fastapi import FastAPI
 from api.events import router as events_router
 
 app = FastAPI(
-    redirect_slashes=False,
     docs_url="/docs",  # Swagger UI
     redoc_url="/redoc",  # ReDoc
     openapi_url="/openapi.json",  # OpenAPI schema

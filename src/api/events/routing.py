@@ -10,7 +10,6 @@ from .schemas import EventListSchema, EventSchema
 router = APIRouter()
 
 
-@router.get("")
 @router.get("/")
 def read_events() -> EventListSchema:
     """Retrieve a list of all events.
@@ -29,6 +28,7 @@ def read_events() -> EventListSchema:
         ],
         count=3,
     )
+
 
 @router.get("/{event_id}")
 def get_event(event_id: int) -> EventSchema:
