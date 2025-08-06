@@ -14,6 +14,9 @@ app = FastAPI(
     docs_url="/docs",  # Swagger UI
     redoc_url="/redoc",  # ReDoc
     openapi_url="/openapi.json",  # OpenAPI schema
+    title="Analytics REST API",
+    description="A REST API for managing analytics data.",
+    version="1.0.0",
 )
 app.include_router(events_router, prefix="/api/events", tags=["events"])
 
