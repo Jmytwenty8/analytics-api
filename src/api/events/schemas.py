@@ -3,6 +3,8 @@
 This module defines Pydantic models for representing event data and lists of events.
 """
 
+from __future__ import annotations
+
 from pydantic import BaseModel
 
 
@@ -17,6 +19,34 @@ class EventSchema(BaseModel):
     """
 
     id: int
+    name: str | None = None
+    description: str | None = None
+
+
+class EventCreateSchema(BaseModel):
+    """Schema for creating a new event.
+
+    Attributes
+    ----------
+    name : str
+        The name of the event.
+
+    """
+
+    name: str
+
+
+class EventUpdateSchema(BaseModel):
+    """Schema for updating an existing event.
+
+    Attributes
+    ----------
+    description : str
+        The new description of the event.
+
+    """
+
+    description: str
 
 
 class EventListSchema(BaseModel):
