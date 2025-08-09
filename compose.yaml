@@ -27,10 +27,8 @@ services:
   
   db_service:
     image: timescale/timescaledb:latest-pg17
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: analytics_db
+    env_file:
+      - .env.compose
     ports:
       - "1234:5432"
     expose:
