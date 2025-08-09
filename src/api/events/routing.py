@@ -4,6 +4,7 @@ This module defines FastAPI routes for listing and retrieving events.
 """
 
 import uuid
+from datetime import datetime, timezone
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -92,6 +93,7 @@ def update_event(
     for key, value in payload.model_dump().items():
         setattr(obj, key, value)
 
+    obj.updated_at = datetime.now(timezone.utc)
     session.add(obj)
     session.commit()
     session.refresh(obj)
@@ -139,7 +141,8 @@ def create_event(payload: EventCreateSchema, session: Annotated[Session, Depends
     """
     # In a real application, you would save the event to a database here.
     data = payload.model_dump()
-    obj = EventModel.model_validate(data)
+    now = datetime.now(timezone.utc)
+    obj = EventModel.model_validate({**data, "created_at": now, "updated_at": now})
     session.add(obj)
     session.commit()
     session.refresh(obj)

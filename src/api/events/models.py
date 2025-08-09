@@ -10,8 +10,22 @@ Includes:
 from __future__ import annotations
 
 import uuid
+from datetime import datetime, timezone
 
+from sqlalchemy import DateTime
 from sqlmodel import Field, SQLModel
+
+
+def get_utc() -> datetime:
+    """Get the current UTC datetime.
+
+    Returns
+    -------
+    datetime
+        The current datetime in UTC timezone.
+
+    """
+    return datetime.now(timezone.utc)
 
 
 class EventModel(SQLModel, table=True):
@@ -27,6 +41,16 @@ class EventModel(SQLModel, table=True):
     id: uuid.UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     name: str | None = Field(default=None)
     description: str | None = Field(default=None)
+    created_at: datetime = Field(
+        default_factory=get_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore[arg-type]
+        nullable=False,
+    )
+    updated_at: datetime = Field(
+        default_factory=get_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore[arg-type]
+        nullable=False,
+    )
 
 
 class EventCreateSchema(SQLModel):
