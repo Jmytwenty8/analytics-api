@@ -98,6 +98,28 @@ def update_event(
     return obj
 
 
+@router.delete("/{event_id}")
+def delete_event(event_id: uuid.UUID, session: Annotated[Session, Depends(get_session)]) -> None:
+    """Delete an event by its ID.
+
+    Parameters
+    ----------
+    event_id : uuid.UUID
+        The unique identifier of the event to delete.
+    session : Session
+        The database session used for interacting with the database.
+
+    """
+    statement = select(EventModel).where(EventModel.id == event_id)
+    obj = session.exec(statement).first()
+
+    if not obj:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    session.delete(obj)
+    session.commit()
+
+
 @router.post("/")
 def create_event(payload: EventCreateSchema, session: Annotated[Session, Depends(get_session)]) -> EventModel:
     """Create a new event.
