@@ -65,39 +65,6 @@ async def validation_exception_handler(_request: Request, exc: FastAPIRequestVal
     )
 
 
-@app.get("/")
-def read_root() -> dict:
-    """Root endpoint returning a simple greeting.
-
-    Returns
-    -------
-    dict
-        A dictionary with a greeting message.
-
-    """
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str | None = None) -> dict:
-    """Retrieve an item by its ID with an optional query parameter.
-
-    Parameters
-    ----------
-    item_id : int
-        The ID of the item to retrieve.
-    q : str, optional
-        An optional query string.
-
-    Returns
-    -------
-    dict
-        A dictionary containing the item ID, query parameter, and a message.
-
-    """
-    return {"item_id": item_id, "q": q, "message": "This is a sample FastAPI application."}
-
-
 @app.get("/health-check")
 def health_check() -> dict:
     """Health check endpoint.
