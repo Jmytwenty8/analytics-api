@@ -78,4 +78,5 @@ def create_event(payload: EventCreateSchema, session: Annotated[Session, Depends
     obj = EventModel.model_validate(data)
     session.add(obj)
     session.commit()
+    session.refresh(obj)
     return obj
