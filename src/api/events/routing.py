@@ -22,16 +22,16 @@ def read_events() -> EventListSchema:
     """
     return EventListSchema(
         results=[
-            EventModel(id=1),
-            EventModel(id=2),
-            EventModel(id=3),
+            EventModel(id="1"),
+            EventModel(id="2"),
+            EventModel(id="3"),
         ],
         count=3,
     )
 
 
 @router.get("/{event_id}")
-def get_event(event_id: int) -> EventModel:
+def get_event(event_id: str) -> EventModel:
     """Retrieve a single event by its ID.
 
     Parameters
@@ -65,4 +65,4 @@ def create_event(payload: EventCreateSchema) -> EventModel:
     """
     # In a real application, you would save the event to a database here.
     data = payload.model_dump()
-    return EventModel(id=42, **data)
+    return EventModel(id="42", **data)
