@@ -5,7 +5,7 @@ This module defines FastAPI routes for listing and retrieving events.
 
 from fastapi import APIRouter
 
-from .schemas import EventCreateSchema, EventListSchema, EventSchema
+from .models import EventCreateSchema, EventListSchema, EventModel
 
 router = APIRouter()
 
@@ -22,16 +22,16 @@ def read_events() -> EventListSchema:
     """
     return EventListSchema(
         results=[
-            EventSchema(id=1),
-            EventSchema(id=2),
-            EventSchema(id=3),
+            EventModel(id=1),
+            EventModel(id=2),
+            EventModel(id=3),
         ],
         count=3,
     )
 
 
 @router.get("/{event_id}")
-def get_event(event_id: int) -> EventSchema:
+def get_event(event_id: int) -> EventModel:
     """Retrieve a single event by its ID.
 
     Parameters
@@ -41,15 +41,15 @@ def get_event(event_id: int) -> EventSchema:
 
     Returns
     -------
-    EventSchema
+    EventModel
         The event object corresponding to the given ID.
 
     """
-    return EventSchema(id=event_id)
+    return EventModel(id=event_id)
 
 
 @router.post("/")
-def create_event(payload: EventCreateSchema) -> EventSchema:
+def create_event(payload: EventCreateSchema) -> EventModel:
     """Create a new event.
 
     Parameters
@@ -59,10 +59,10 @@ def create_event(payload: EventCreateSchema) -> EventSchema:
 
     Returns
     -------
-    EventSchema
+    EventModel
         The created event object.
 
     """
     # In a real application, you would save the event to a database here.
     data = payload.model_dump()
-    return EventSchema(id=42, **data)
+    return EventModel(id=42, **data)

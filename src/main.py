@@ -5,9 +5,25 @@ This module initializes the FastAPI app, includes routers, and defines basic end
 
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
+from typing import TYPE_CHECKING
+
 from fastapi import FastAPI
 
+from api.db.session import init_db
 from api.events import router as events_router
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    """Application lifespan events."""
+    init_db()
+    yield
+    # cleanup
+
 
 app = FastAPI(
     docs_url="/docs",  # Swagger UI
@@ -16,6 +32,7 @@ app = FastAPI(
     title="Analytics REST API",
     description="A REST API for managing analytics data.",
     version="1.0.0",
+    lifespan=lifespan,
 )
 app.include_router(events_router, prefix="/api/events", tags=["events"])
 
