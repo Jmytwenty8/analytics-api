@@ -8,7 +8,9 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError as FastAPIRequestValidationError
+from fastapi.responses import JSONResponse
 
 from api.db.session import init_db
 from api.events import router as events_router
@@ -18,7 +20,7 @@ if TYPE_CHECKING:
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan events."""
     init_db()
     yield
@@ -35,6 +37,32 @@ app = FastAPI(
     lifespan=lifespan,
 )
 app.include_router(events_router, prefix="/api/events", tags=["events"])
+
+
+@app.exception_handler(FastAPIRequestValidationError)
+async def validation_exception_handler(_request: Request, exc: FastAPIRequestValidationError) -> JSONResponse:
+    """Handle FastAPI request validation errors and return a JSON response.
+
+    Parameters
+    ----------
+    request : Request
+        The incoming HTTP request.
+        The incoming HTTP request.
+    exc : FastAPIRequestValidationError
+        The validation error raised by FastAPI.
+
+    Returns
+    -------
+    JSONResponse
+        A JSON response with a 422 status code and error details.
+
+    """
+    # Extract the first error message, or provide a default
+    error_msg = exc.errors()[0]["msg"] if exc.errors() else "Invalid input"
+    return JSONResponse(
+        status_code=422,
+        content={"detail": error_msg},
+    )
 
 
 @app.get("/")

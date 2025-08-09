@@ -6,7 +6,7 @@ This module defines FastAPI routes for listing and retrieving events.
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
 from api.db.session import get_session
@@ -52,8 +52,12 @@ def get_event(event_id: uuid.UUID, session: Annotated[Session, Depends(get_sessi
 
     """
     statement = select(EventModel).where(EventModel.id == event_id)
+    result = session.exec(statement).first()
 
-    return session.exec(statement).one()
+    if not result:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    return result
 
 
 @router.post("/")
