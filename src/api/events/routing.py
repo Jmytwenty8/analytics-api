@@ -11,7 +11,7 @@ from sqlmodel import Session, select
 
 from api.db.session import get_session
 
-from .models import EventCreateSchema, EventListSchema, EventModel
+from .models import EventCreateSchema, EventListSchema, EventModel, EventUpdateSchema
 
 router = APIRouter()
 
@@ -58,6 +58,44 @@ def get_event(event_id: uuid.UUID, session: Annotated[Session, Depends(get_sessi
         raise HTTPException(status_code=404, detail="Event not found")
 
     return result
+
+
+@router.put("/{event_id}")
+def update_event(
+    event_id: uuid.UUID,
+    payload: EventUpdateSchema,
+    session: Annotated[Session, Depends(get_session)],
+) -> EventModel:
+    """Update an existing event.
+
+    Parameters
+    ----------
+    event_id : uuid.UUID
+        The unique identifier of the event to update.
+    payload : EventUpdateSchema
+        The new data for the event.
+    session : Session
+        The database session used for interacting with the database.
+
+    Returns
+    -------
+    EventModel
+        The updated event object.
+
+    """
+    statement = select(EventModel).where(EventModel.id == event_id)
+    obj = session.exec(statement).first()
+
+    if not obj:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    for key, value in payload.model_dump().items():
+        setattr(obj, key, value)
+
+    session.add(obj)
+    session.commit()
+    session.refresh(obj)
+    return obj
 
 
 @router.post("/")
