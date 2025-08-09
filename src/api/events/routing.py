@@ -3,7 +3,13 @@
 This module defines FastAPI routes for listing and retrieving events.
 """
 
-from fastapi import APIRouter
+import uuid
+from typing import Annotated
+
+from fastapi import APIRouter, Depends
+from sqlmodel import Session, select
+
+from api.db.session import get_session
 
 from .models import EventCreateSchema, EventListSchema, EventModel
 
@@ -11,7 +17,7 @@ router = APIRouter()
 
 
 @router.get("/")
-def read_events() -> EventListSchema:
+def read_events(session: Annotated[Session, Depends(get_session)]) -> EventListSchema:
     """Retrieve a list of all events.
 
     Returns
@@ -20,24 +26,24 @@ def read_events() -> EventListSchema:
         A schema containing a list of event objects and the total count.
 
     """
+    statement = select(EventModel)
+    results = session.exec(statement).all()
     return EventListSchema(
-        results=[
-            EventModel(id="1"),
-            EventModel(id="2"),
-            EventModel(id="3"),
-        ],
-        count=3,
+        results=list(results),
+        count=len(results),
     )
 
 
 @router.get("/{event_id}")
-def get_event(event_id: str) -> EventModel:
+def get_event(event_id: uuid.UUID, session: Annotated[Session, Depends(get_session)]) -> EventModel:
     """Retrieve a single event by its ID.
 
     Parameters
     ----------
-    event_id : int
+    event_id : uuid.UUID
         The unique identifier of the event to retrieve.
+    session : Session
+        The database session used for interacting with the database.
 
     Returns
     -------
@@ -45,17 +51,21 @@ def get_event(event_id: str) -> EventModel:
         The event object corresponding to the given ID.
 
     """
-    return EventModel(id=event_id)
+    statement = select(EventModel).where(EventModel.id == event_id)
+
+    return session.exec(statement).one()
 
 
 @router.post("/")
-def create_event(payload: EventCreateSchema) -> EventModel:
+def create_event(payload: EventCreateSchema, session: Annotated[Session, Depends(get_session)]) -> EventModel:
     """Create a new event.
 
     Parameters
     ----------
     payload : EventCreateSchema
         The data for the new event.
+    session : Session
+        The database session used for interacting with the database.
 
     Returns
     -------
@@ -65,4 +75,7 @@ def create_event(payload: EventCreateSchema) -> EventModel:
     """
     # In a real application, you would save the event to a database here.
     data = payload.model_dump()
-    return EventModel(id="42", **data)
+    obj = EventModel.model_validate(data)
+    session.add(obj)
+    session.commit()
+    return obj

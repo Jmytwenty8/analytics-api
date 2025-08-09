@@ -19,12 +19,12 @@ class EventModel(SQLModel, table=True):
 
     Attributes
     ----------
-    id : str
+    id : uuid.UUID
         The unique identifier of the event.
 
     """
 
-    id: str = Field(primary_key=True, default_factory=uuid.uuid4)
+    id: uuid.UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     name: str | None = Field(default=None)
     description: str | None = Field(default=None)
 

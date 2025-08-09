@@ -23,3 +23,15 @@ def init_db() -> None:
     database engine to create all database tables.
     """
     SQLModel.metadata.create_all(engine)
+
+
+def get_session() -> sqlmodel.Session:
+    """Get a new database session.
+
+    Returns
+    -------
+    sqlmodel.Session
+        A new SQLModel session connected to the database.
+
+    """
+    return sqlmodel.Session(engine)
