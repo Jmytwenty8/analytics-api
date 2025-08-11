@@ -11,7 +11,7 @@ from sqlmodel import Session, select
 
 from api.db.session import get_session
 
-from .models import EventCreateSchema, EventListSchema, EventModel, EventUpdateSchema, get_utc
+from .models import EventCreateSchema, EventListSchema, EventModel, EventUpdateSchema
 
 router = APIRouter()
 
@@ -92,7 +92,6 @@ def update_event(
     for key, value in payload.model_dump().items():
         setattr(obj, key, value)
 
-    obj.updated_at = get_utc()
     session.add(obj)
     session.commit()
     session.refresh(obj)
@@ -139,9 +138,8 @@ def create_event(payload: EventCreateSchema, session: Annotated[Session, Depends
 
     """
     # In a real application, you would save the event to a database here.
-    data = payload.model_dump()
-    now = get_utc()
-    obj = EventModel.model_validate({**data, "created_at": now, "updated_at": now})
+
+    obj = EventModel(**payload.model_dump())
     session.add(obj)
     session.commit()
     session.refresh(obj)

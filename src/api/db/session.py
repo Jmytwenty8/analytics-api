@@ -5,6 +5,7 @@ using the SQLModel metadata and the configured database engine.
 """
 
 import sqlmodel
+import timescaledb
 from sqlmodel import SQLModel
 
 from api.db.config import DATABASE_URL
@@ -23,6 +24,7 @@ def init_db() -> None:
     database engine to create all database tables.
     """
     SQLModel.metadata.create_all(engine)
+    timescaledb.metadata.create_all(engine)
 
 
 def get_session() -> sqlmodel.Session:

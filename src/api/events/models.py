@@ -9,48 +9,32 @@ Includes:
 
 from __future__ import annotations
 
-import uuid
-from datetime import datetime, timezone
-
-from sqlalchemy import DateTime
 from sqlmodel import Field, SQLModel
+from timescaledb import TimescaleModel
 
 
-def get_utc() -> datetime:
-    """Get the current UTC datetime.
-
-    Returns
-    -------
-    datetime
-        The current datetime in UTC timezone.
-
-    """
-    return datetime.now(timezone.utc)
-
-
-class EventModel(SQLModel, table=True):
+class EventModel(TimescaleModel, table=True):
     """Schema representing an event.
 
     Attributes
     ----------
-    id : uuid.UUID
-        The unique identifier of the event.
+    name : str | None
+        The name of the event.
+    description : str | None
+        The description of the event.
+    created_at : datetime
+        The timestamp when the event was created.
+    updated_at : datetime
+        The timestamp when the event was last updated.
 
     """
 
-    id: uuid.UUID = Field(primary_key=True, default_factory=uuid.uuid4)
-    name: str | None = Field(default=None)
+    # id field is inherited from TimescaleModel (int | None)
+    name: str = Field(index=True, nullable=False)
     description: str | None = Field(default=None)
-    created_at: datetime = Field(
-        default_factory=get_utc,
-        sa_type=DateTime(timezone=True),  # type: ignore[arg-type]
-        nullable=False,
-    )
-    updated_at: datetime = Field(
-        default_factory=get_utc,
-        sa_type=DateTime(timezone=True),  # type: ignore[arg-type]
-        nullable=False,
-    )
+
+    __chunk_time_interval__ = "INTERVAL 1 days"
+    __drop_after__ = "INTERVAL 30 days"
 
 
 class EventCreateSchema(SQLModel):
